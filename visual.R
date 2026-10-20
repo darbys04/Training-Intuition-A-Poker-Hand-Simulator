@@ -1,6 +1,6 @@
 library(readxl)
 library(tidyverse)
-setwd("C:/Users/anna/OneDrive/cycle")
+setwd("C:/Users/anna/GitHub/Training-Intuition-A-Poker-Hand-Simulator")
 poker <- read_excel("poker_probabilities_comparison.xlsx")
 poker_vis <- poker |>
   pivot_longer(
@@ -8,20 +8,21 @@ poker_vis <- poker |>
     names_to = "num_cards",
     values_to = "probability"
   ) |>
-  group_by(across(all_of("Poker Hand"))) |> 
   summarise(avg_prob = mean(probability)) |> 
-  ggplot(aes(x=reorder(`Poker Hand`, avg_prob), y = avg_prob)) +
+  ggplot(aes(x=`Poker Hand`, y = avg_prob, fill = num_card)) +
   geom_col() +
   labs(
     title = 'Average Probability of Hand for 5-7 Card Draw',
     x = 'Hand Type',
     y = 'Average Probability'
-  )
+  ) + 
+  theme_bw()
+
 poker_vis  
 
 
 
-
+'''
 poker_vis <- poker |>
   pivot_longer(
     cols = ends_with("(%)"),
@@ -38,3 +39,4 @@ poker_vis <- poker |>
   ) +
   theme_classic()
 poker_vis  
+'''
