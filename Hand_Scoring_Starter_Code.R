@@ -2,21 +2,21 @@
 score_hand <- function(hand) {
   
   # Check if hand is a straight
-  if (all(diff(sort(hand$rank)) == 1)) {
+  if (?????????) {
     print("Hand is a straight")
   } else {
     print("Hand is not a straight")
   }
   
   # Check if hand is a flush
-  if (length(unique(hand$suit)) == 1) {
+  if (?????????) {
     print("Hand is a flush")
   } else {
     print("Hand is not a flush")
   }
   
   # Check if hand is a full house
-  if (identical(sort(as.numeric(table(hand$rank))), c(2, 3))) {
+  if (?????????) {
     print("Hand is a full house")
   } else {
     print("Hand is not a full house")
