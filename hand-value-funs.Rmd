@@ -9,6 +9,12 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Libraries
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+
 ## Function 1
 ```{r}
 hand_value <- function(hand) { # function with hand as argument
@@ -183,5 +189,122 @@ test_cases <- list(
 )
 test_results <- lapply(test_cases, hand_score) # applying function to all of test cases
 print(test_results) 
+```
+## Hand Simulations
+
+### Draw Function
+```{r}
+draw <- function(deck, n) { 
+  hand <- deck |>  
+    slice_sample(n=n) 
+  remaining_deck <- deck |> 
+    anti_join(hand) 
+  return(hand) 
+}
+hearts <- data.frame(
+  rank = 2:14,
+  suit = "heart" 
+) # created hearts df
+clubs <- data.frame(
+  rank = 2:14,
+  suit = "club" 
+) # clubs df
+spades <- data.frame(
+  rank = 2:14,
+  suit = "spade" 
+) # spades df
+diamonds <- data.frame(
+  rank = 2:14,
+  suit = "diamond" 
+) # diamonds
+deck <- rbind(hearts, clubs, spades, diamonds) 
+```
+
+### 5 cards
+```{r, message=FALSE}
+set.seed(123)
+values_5card <- data.frame(
+  value = character()
+)
+for (i in 1:5000){
+  hand <- draw(deck, 5)
+  value <- hand_value(hand)
+  values_5card <- rbind(values_5card, data.frame(value = value))
+}
+```
+
+```{r}
+all_hands <- c("High Card", "One Pair", "Two Pair", "Three of a Kind",
+               "Straight", "Flush", "Full House", "Four of a Kind",
+               "Straight Flush", "Royal Flush")
+values_5card |> 
+  count(value) |> 
+  complete(value = all_hands, fill = list(n = 0)) |> 
+  ggplot() +
+  geom_col(aes(x=reorder(value, -n), y=n),  position = "dodge") +
+  labs(
+    title = 'Count of Hand Value for 5 Card Draw',
+    x = 'Hand Type',
+    y = 'Count',
+  ) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### 6 cards
+```{r, message = FALSE}
+set.seed(123)
+values_6card <- data.frame(
+  value = character()
+)
+for (i in 1:5000){
+  hand <- draw(deck, 6)
+  value <- hand_score(hand)[[1]]
+  values_6card <- rbind(values_6card, data.frame(value = value))
+}
+```
+
+```{r}
+values_6card |> 
+  count(value) |> 
+  complete(value = all_hands, fill = list(n = 0)) |> 
+  ggplot() +
+  geom_col(aes(x=reorder(value, -n), y=n),  position = "dodge") +
+  labs(
+    title = 'Count of Hand Value for 6 Card Draw',
+    x = 'Hand Type',
+    y = 'Count',
+  ) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### 7 cards
+
+```{r, message=FALSE}
+set.seed(123)
+values_7card <- data.frame(
+  value = character()
+)
+for (i in 1:5000){
+  hand <- draw(deck, 7)
+  value <- hand_score(hand)[[1]]
+  values_7card <- rbind(values_7card, data.frame(value = value))
+}
+```
+
+```{r}
+values_7card |> 
+  count(value) |> 
+  complete(value = all_hands, fill = list(n = 0)) |> 
+  ggplot() +
+  geom_col(aes(x=reorder(value, -n), y=n),  position = "dodge") +
+  labs(
+    title = 'Count of Hand Value for 7 Card Draw',
+    x = 'Hand Type',
+    y = 'Count',
+  ) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
