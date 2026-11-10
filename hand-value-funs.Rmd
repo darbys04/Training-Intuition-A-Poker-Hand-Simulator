@@ -194,6 +194,7 @@ print(test_results)
 
 ### Draw Function
 ```{r}
+# draw function from earlier r script
 draw <- function(deck, n) { 
   hand <- deck |>  
     slice_sample(n=n) 
@@ -201,6 +202,7 @@ draw <- function(deck, n) {
     anti_join(hand) 
   return(hand) 
 }
+# creating deck dataframe
 hearts <- data.frame(
   rank = 2:14,
   suit = "heart" 
@@ -223,36 +225,35 @@ deck <- rbind(hearts, clubs, spades, diamonds)
 ### 5 cards
 ```{r, message=FALSE}
 set.seed(123)
-values_5card <- data.frame(
+values_5card <- data.frame( 
   value = character()
-)
-for (i in 1:5000){
-  hand <- draw(deck, 5)
-  value <- hand_value(hand)
-  values_5card <- rbind(values_5card, data.frame(value = value))
+) # empty dataframe for all observations
+for (i in 1:5000){ # simulate 5000 times
+  hand <- draw(deck, 5) # draw 5 cards
+  value <- hand_value(hand) # find value of the hand drawn
+  values_5card <- rbind(values_5card, data.frame(value = value)) # add value to empty df
 }
 ```
 
 ```{r}
-all_hands <- c("High Card", "One Pair", "Two Pair", "Three of a Kind",
-               "Straight", "Flush", "Full House", "Four of a Kind",
-               "Straight Flush", "Royal Flush")
+all_hands <- c("High Card", "One Pair", "Two Pair", "Three of a Kind", "Straight", "Flush", "Full House", "Four of a Kind", "Straight Flush", "Royal Flush") # df of all hand types (so they all appear on graph)
 values_5card |> 
-  count(value) |> 
-  complete(value = all_hands, fill = list(n = 0)) |> 
-  ggplot() +
+  count(value) |> # create variable with count of all the hand values
+  complete(value = all_hands, fill = list(n = 0)) |> # add hands that didn't appear
+  ggplot() + # plot on bar chart 
   geom_col(aes(x=reorder(value, -n), y=n),  position = "dodge") +
-  labs(
+  labs( # adding labels 
     title = 'Count of Hand Value for 5 Card Draw',
     x = 'Hand Type',
     y = 'Count',
   ) +
-  theme_classic() +
+  theme_classic() + # adjusting axes
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ### 6 cards
 ```{r, message = FALSE}
+# repeat sample process fo 6 cards
 set.seed(123)
 values_6card <- data.frame(
   value = character()
@@ -265,6 +266,7 @@ for (i in 1:5000){
 ```
 
 ```{r}
+# repeat visual code for 6 cards
 values_6card |> 
   count(value) |> 
   complete(value = all_hands, fill = list(n = 0)) |> 
@@ -282,6 +284,7 @@ values_6card |>
 ### 7 cards
 
 ```{r, message=FALSE}
+# repeat simulation for 7 cards
 set.seed(123)
 values_7card <- data.frame(
   value = character()
@@ -294,6 +297,7 @@ for (i in 1:5000){
 ```
 
 ```{r}
+# repeat visualization for 7 cards
 values_7card |> 
   count(value) |> 
   complete(value = all_hands, fill = list(n = 0)) |> 
