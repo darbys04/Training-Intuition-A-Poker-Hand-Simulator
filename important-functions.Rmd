@@ -148,6 +148,55 @@ hand_score <- function(hand) { # created function with hand as argument
 
 ## Tiebreaker
 
+```{r}
+Tie_Breaker <- function(hand_1, hand_2, score)
+{
+  # 2.1 Royal Flush
+  if( score == "Royal Flush" )
+    return( "Tie" )
+  rank_1 <- hand_1$rank
+  rank_2 <- hand_2$rank
+    if (score == "Straight Flush" || score == "Straight") {
+      high_1 <- max(rank_1) 
+      high_2 <- max(rank_2)
+      if((high_1 == 14 && min(rank_1) == 2)){
+        high_1 <- 5
+      }
+      if(high_2 == 14 && min(rank_2) == 2){
+        high_2 <- 5
+      }
+      if(high_1 > high_2){
+        return( hand_1 )
+      }
+    else if(high_1 < high_2){
+      return( hand_2 )
+      }
+    else{
+      return( "Tie" )
+      }
+    }
+  key <- function(r) {
+    count <- tabulate(r, nbins = 14)
+    u <- which(count > 0)          
+    u[order(-count[u], -u)]
+  }
+  k1 <- key(rank_1)
+  k2 <- key(rank_2)
+
+  d <- which(k1 != k2)
+  if (length(d) == 0) {
+    return("Tie")
+  }
+  if (k1[d[1]] > k2[d[1]]) {
+    return(hand_1) 
+  }
+  else {
+    hand_2
+  }
+}
+```
+
+
 ## Simulating
 
 ```{r}
