@@ -1,0 +1,159 @@
+---
+title: "Important Functions"
+author: "Anna Hale"
+date: "2026-11-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Deck of Card Dataframe
+
+```{r}
+# creating deck dataframe
+hearts <- data.frame(
+  rank = 2:14,
+  suit = "heart" 
+) # created hearts df
+clubs <- data.frame(
+  rank = 2:14,
+  suit = "club" 
+) # clubs df
+spades <- data.frame(
+  rank = 2:14,
+  suit = "spade" 
+) # spades df
+diamonds <- data.frame(
+  rank = 2:14,
+  suit = "diamond" 
+) # diamonds
+deck <- rbind(hearts, clubs, spades, diamonds) 
+```
+
+
+## Draw
+
+```{r}
+# draw function that also returns remaining deck
+draw_w_hand <- function(deck, n) { 
+  hand <- deck |>  
+    slice_sample(n=n) 
+  remaining_deck <- deck |> 
+    anti_join(hand) 
+  return(list(hand, remaining_deck)) 
+}
+# draw 
+draw <- function(deck, n) { 
+  hand <- deck |>  
+    slice_sample(n=n) 
+  return(hand) 
+}
+```
+
+## Hand Value
+
+```{r}
+hand_value <- function(hand) { # function with hand as argument
+  ranks <- sort(as.numeric(hand$rank)) # created column vector of all of the ranks sorted by rank
+  counts <- sort(rle(ranks)$lengths, decreasing = TRUE)
+  distinct_ranks <- length(unique(hand$rank)) # counted the number of distinct ranks
+  straight <- length(counts) == 5 &&
+    (ranks[5] - ranks[1] == 4 || all(ranks == c(2, 3, 4, 5, 14))) # T/F value if hand is straight (1 rank difference between each card) (note the included ace-low hand)
+  flush <- all(hand$suit == hand$suit[1]) # T/F value if hand is flush (suits are identical)
+  if (flush == TRUE) {
+    if (straight == TRUE) {
+      if (identical(ranks, c(10, 11, 12, 13, 14))) {
+        return("Royal Flush") 
+        # if hand is flush, straight, and 10-A, return royal flush
+      }
+      else {
+        return("Straight Flush")
+        # if hand is flush, straight, and not a royal flush, return straight flush
+      }
+    }
+    else {
+      return("Flush")
+      # if hand is a flush but not a straight, return flush
+    }
+  }
+  else if (distinct_ranks == 2) { # if there are only 2 types of ranks in the hand
+    if (ranks[1] == ranks[4] || ranks[2] == ranks[5]) {
+      return("Four of a Kind")
+      # if 4 of the cards are the same rank, return 4 of a kind 
+    }
+    else {
+      return("Full House")
+      # if two distinct ranks in the hand and not 4 of a kind, return full house (must be 3 of same rank and 2 of (same) other rank)
+    }
+  }
+  else if (straight == TRUE) {
+    return("Straight")
+    # if hand does not meet previous conditions and is a straight, return straight
+  }
+  else if (distinct_ranks == 3) { # if hand has three different types of rank
+    count <- table(ranks) # count the number of cards is each rank
+    if (max(count) == 3) { 
+      return("Three of a Kind")
+      # if hand has 3 of the same rank, return three of a kind
+    }
+    else {
+      return("Two Pair")
+      # if not three of a kind, must be 2 pair 
+    }
+  }
+  else if (distinct_ranks == 4) {
+    return("One Pair")
+    # if there are 4 distinct ranks, two must be same rank, therefore return one pair
+  }
+  else {
+    return("High Card")
+    # if none of these conditions are met, return high card
+  }
+}
+```
+
+
+## Hand Selection
+
+```{r}
+hand_score <- function(hand) { # created function with hand as argument
+  if (nrow(hand) == 5) { # if 5-card hand, return the hand with the value of hand
+    return(list(hand_value(hand), hand))
+  }
+  else {
+    hand_order <- c("High Card", "One Pair", "Two Pair", "Three of a Kind",
+                  "Straight", "Flush", "Full House", "Four of a Kind",
+                  "Straight Flush", "Royal Flush") # created way to order the hands 
+    combs <- combn(nrow(hand), 5) # all possible combinations
+    best_rank <- 0 
+    best_value <- NULL
+    best_subset <- NULL # initalized variables for the best rank, value, subset
+    for (i in 1:ncol(combs)) { # going through all cominations
+      current_subset <- hand[combs[, i], ] # found the current subset we are evaluating
+      value <- as.character(hand_value(current_subset)) # found the value of the current subset
+      rank <- match(value, hand_order) # found the "rank" of the value of the subset
+      if (rank > best_rank) { # if this rank if better than previous, it replaces the best rank
+        best_rank <- rank
+        best_value <- value
+        best_subset <- current_subset
+      }
+    }
+    return(list(best_value, best_subset)) # return best rank
+  }
+}
+```
+
+
+## Tiebreaker
+
+## Simulating
+
+```{r}
+simulating_hands <- function(n, deck, reps) {
+  values <- replicate(reps, hand_score(draw(deck, n))[[1]])
+  data.frame(value = values)
+}
+```
+
